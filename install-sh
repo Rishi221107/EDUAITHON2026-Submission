@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -e
+
+echo "🚀 Installing OpenWebUI + Ollama..."
+
+# 1️⃣ Check Docker
+if ! command -v docker &> /dev/null; then
+  echo "❌ Docker not found. Please install Docker first."
+  exit 1
+fi
+
+# 2️⃣ Check Docker Compose
+if ! docker compose version &> /dev/null; then
+  echo "❌ Docker Compose not found."
+  exit 1
+fi
+
+# 3️⃣ Clone repo
+REPO_URL="https://github.com/YOUR_GITHUB_USERNAME/openwebui-ollama-setup.git"
+DIR_NAME="openwebui-ollama-setup"
+
+if [ ! -d "$DIR_NAME" ]; then
+  git clone "$REPO_URL"
+fi
+
+cd "$DIR_NAME"
+
+# 4️⃣ Environment setup
+if [ ! -f ".env" ]; then
+  cp .env.example .env
+fi
+
+# 5️⃣ Start services
+docker compose up -d
+
+# 6️⃣ Pull model
+echo "📥 Pulling Ollama model..."
+docker exec -it ollama ollama pull llama3.2
+
+echo ""
+echo "✅ Installation Complete!"
+echo "🌐 OpenWebUI → http://localhost:3000"
+echo "🤖 Model → llama3.2"
